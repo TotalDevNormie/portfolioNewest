@@ -1,0 +1,791 @@
+.drawerWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10rem 3rem;
+  cursor: grab;
+  z-index: 5;
+}
+
+.drawerWrapper:active {
+  cursor: grabbing;
+}
+
+.gradientOverlay {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 30rem; /* Adjust height as needed */
+  pointer-events: none; /* Allows clicks to pass through to elements behind it */
+  z-index: 0; /* Ensure it's above other content if needed */
+}
+
+.fixedText {
+  position: fixed;
+  top: 10%; /* 30% from the top of the viewport */
+  left: 50%;
+  transform: translateX(-50%); /* Center horizontally */
+  color: #eeeeee; /* Light color for visibility */
+  font-family: "Notable", sans-serif;
+  font-style: normal;
+  font-size: 12vw; /* Adjust font size as needed */
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.7;
+  user-select: none; /* Prevent text selection */
+  pointer-events: none; /* Allows clicks to pass through */
+  z-index: 3;
+}
+
+.drawerContainer {
+  font-size: clamp(0.8rem, 2.5vw, 1.8rem);
+  font-family: "SF Mono", "Monaco", "Inconsolata", "Roboto Mono", "Source Code Pro", "Menlo", "Consolas", monospace;
+  --side-color: #a1babb;
+  --side-color-tint: #b6ccbf;
+  --wall-color: #bdcdd1;
+  --wall-color-tint: #d0ded9;
+  --shadow-color: #555263;
+  --border-color: #434e50;
+  --box-count: 2;
+  --top-height: 1em;
+  --width: 10em;
+  --height-box: 4em;
+  --front-height: calc(var(--height-box) + 2em);
+  --box-offset: 0.5em;
+  --bottom-padding: 2em;
+  --height: calc(var(--bottom-padding) + (var(--front-height) * var(--box-count)));
+  --border-size: 0.1em;
+  position: relative;
+  transform: rotateX(-20deg) rotateY(5deg);
+  transform-style: preserve-3d;
+  width: var(--width);
+  height: var(--height);
+  user-select: none;
+  transition: transform 0.1s ease;
+}
+
+.popIn {
+  animation: popIn 2s ease-out;
+}
+
+@keyframes popIn {
+  from {
+    transform: translateY(100%) scale(0);
+  }
+
+  to {
+    transform: translateY(0) scale(1);
+  }
+}
+
+.drawerWall {
+  position: absolute;
+  width: var(--width);
+  height: var(--height);
+  transform-style: preserve-3d;
+}
+
+.drawerWall::before {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: rotateY(0deg);
+  border: var(--border-size) solid var(--border-color);
+  background-color: var(--wall-color);
+}
+
+.drawerWall::after {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: var(--shadow-color);
+  border: var(--border-size) solid var(--border-color);
+  transform: rotateY(180deg);
+}
+
+.drawerWall .wall {
+  position: absolute;
+  inset: 0;
+}
+
+.left {
+  transform: rotateY(-90deg);
+  right: calc(var(--width) / 2);
+}
+
+.right {
+  transform: rotateY(90deg);
+  left: calc(var(--width) / 2);
+}
+
+.front {
+  transform: translateZ(calc(var(--width) / 2));
+  background: none !important;
+  border: none;
+}
+
+.front::before,
+.front::after {
+  content: none;
+}
+
+.front .frontLeft {
+  position: absolute;
+  height: var(--height);
+  width: var(--box-offset);
+  background-color: var(--wall-color-tint);
+  border: var(--border-size) solid var(--border-color);
+  border-right: none;
+  left: 0;
+  top: 0;
+}
+
+.front .frontRight {
+  position: absolute;
+  height: var(--height);
+  width: var(--box-offset);
+  background-color: var(--wall-color-tint);
+  border: var(--border-size) solid var(--border-color);
+  border-left: none;
+  right: 0;
+  top: 0;
+}
+
+.front .frontTop {
+  position: absolute;
+  height: var(--box-offset);
+  width: calc(var(--width) - var(--box-offset) * 2);
+  background-color: var(--wall-color-tint);
+  border-top: var(--border-size) solid var(--border-color);
+  left: 50%;
+  transform: translateX(-50%);
+  top: 0;
+}
+
+.front .frontBottom {
+  position: absolute;
+  height: calc(var(--bottom-padding) + var(--box-offset) / 2);
+  width: calc(var(--width) - var(--box-offset) * 2);
+  background-color: var(--wall-color-tint);
+  border-bottom: var(--border-size) solid var(--border-color);
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 0;
+}
+
+.back {
+  transform: translateZ(calc(var(--width) / -2)) rotateY(180deg);
+}
+
+.back::before {
+  background-color: var(--wall-color-tint);
+}
+
+.drawerTop {
+  --top-width: calc(var(--width) + 1em);
+  --translate: translateZ(calc(((var(--top-width) / 2) + var(--top-height)) * -1));
+  position: absolute;
+  transform-style: preserve-3d;
+  transform: translateX(-0.5em) translateY(calc(var(--top-height) * -1));
+}
+
+.drawerTop .wall {
+  width: var(--top-width);
+  height: var(--top-height);
+  background-color: var(--side-color);
+  border: var(--border-size) solid var(--border-color);
+  position: absolute;
+}
+
+.drawerTop .leftTop {
+  transform: rotateY(-90deg);
+  background-color: var(--side-color-tint);
+  left: calc(var(--top-width) / -2);
+}
+
+.drawerTop .rightTop {
+  transform: rotateY(90deg);
+  background-color: var(--side-color-tint);
+  left: calc(var(--top-width) / 2);
+}
+
+.drawerTop .frontTop {
+  transform: translateZ(calc(var(--top-width) / 2));
+  top: 0;
+}
+
+.drawerTop .backTop {
+  transform: translateZ(calc(var(--top-width) / -2)) rotateY(180deg);
+  top: 0;
+}
+
+.drawerTop .topTop {
+  width: var(--top-width);
+  height: var(--top-width);
+  background-color: var(--wall-color);
+  transform: rotateX(90deg) translateZ(calc((var(--top-width) / 2)));
+  top: 0;
+}
+
+.boxWrapper {
+  --width-box: calc(var(--width) - 2 * var(--box-offset));
+  --front-thickness: calc(var(--box-offset) * 2);
+  width: calc(var(--width) - 2 * var(--box-offset));
+  height: var(--height-box);
+  position: absolute;
+  transform-style: preserve-3d;
+  top: calc(var(--front-height) / 2 + 1em - var(--border-size) * 2);
+  left: 50%;
+}
+
+.boxWrapper:nth-child(1) {
+  transform: translate3d(-50%, -50%, calc(var(--front-thickness) / 2));
+}
+
+.boxWrapper:nth-child(2) {
+  transform: translate3d(-50%, calc(var(--front-height) - 50%), calc(var(--front-thickness) / 2));
+}
+
+.boxWrapper:nth-child(3) {
+  transform: translate3d(-50%, calc(var(--front-height) * 2 - 50%), calc(var(--front-thickness) / 2));
+}
+
+.boxWrapper:nth-child(4) {
+  transform: translate3d(-50%, calc(var(--front-height) * 3 - 50%), calc(var(--front-thickness) / 2));
+}
+
+.drawerBox {
+  cursor: pointer;
+  width: calc(var(--width) - 2 * var(--box-offset));
+  height: var(--height-box);
+  position: absolute;
+  transform-style: preserve-3d;
+}
+
+.opened,
+.closed {
+  transition: transform 0.5s cubic-bezier(0.59, 0.05, 0.21, 0.98);
+}
+
+.opened {
+  transform: translateZ(calc(var(--width) - 3 * var(--box-offset)));
+}
+
+.closed {
+  transform: translateZ(0);
+}
+
+.wallBox {
+  position: absolute;
+  background-color: var(--wall-color);
+  border: var(--border-size) solid var(--border-color);
+  width: var(--width-box);
+  height: var(--height-box);
+}
+
+.leftBox {
+  transform: rotateY(-90deg);
+  right: calc(var(--width-box) / 2);
+}
+
+.rightBox {
+  transform: rotateY(90deg);
+  left: calc(var(--width-box) / 2);
+}
+
+.frontBox {
+  --front-width: var(--width);
+  height: var(--front-height);
+  transform-style: preserve-3d;
+  position: absolute;
+  border: var(--border-size) solid var(--border-color);
+  background-color: var(--wall-color-tint);
+  transform: translateZ(calc(var(--width-box) / 2)) translate(calc(var(--front-thickness) / -2), -1.5em);
+  width: var(--front-width);
+}
+
+.frontBox .frontFront {
+  --handle-height: 0.5em;
+  --handle-width: 3em;
+  --_handle-color: #b4b4d7;
+  --_handle-border-color: #3a435f;
+  transform-style: preserve-3d;
+  border: var(--border-size) solid var(--border-color);
+  position: absolute;
+  width: var(--front-width);
+  height: var(--front-height);
+  top: calc(var(--border-size) * -1);
+  left: calc(var(--border-size) * -1);
+  background-color: var(--wall-color);
+  transform: translateZ(var(--front-thickness));
+}
+
+.frontBox .frontFront .handleFront {
+  position: absolute;
+  width: var(--handle-width);
+  height: var(--handle-height);
+  background-color: var(--_handle-color);
+  top: calc(var(--front-height) / 3);
+  left: calc(var(--front-width) / 2);
+  transform: translateZ(var(--handle-height)) translate(-50%, -50%);
+  border: var(--border-size) solid var(--_handle-border-color);
+}
+
+.frontBox .frontFront .handleLeft {
+  position: absolute;
+  width: var(--handle-height);
+  height: var(--handle-height);
+  background-color: var(--_handle-color);
+  top: calc(var(--front-height) / 3);
+  left: calc(var(--front-width) / 2);
+  transform: translateZ(calc(var(--handle-height) / 2)) translate(calc(-50% + var(--handle-width) / -2), -50%)
+    rotateY(90deg);
+  border: var(--border-size) solid var(--_handle-border-color);
+}
+
+.frontBox .frontFront .handleRight {
+  position: absolute;
+  width: var(--handle-height);
+  height: var(--handle-height);
+  background-color: var(--_handle-color);
+  top: calc(var(--front-height) / 3);
+  left: calc(var(--front-width) / 2);
+  border: var(--border-size) solid var(--_handle-border-color);
+  transform: translateZ(calc(var(--handle-height) / 2)) translate(calc(-50% + var(--handle-width) / 2), -50%)
+    rotateY(-90deg);
+}
+
+.frontBox .frontFront .handleTop {
+  position: absolute;
+  width: var(--handle-width);
+  height: var(--handle-height);
+  background-color: var(--_handle-color);
+  border: var(--border-size) solid var(--_handle-border-color);
+  top: calc(var(--front-height) / 3);
+  left: calc(var(--front-width) / 2);
+  transform: translateZ(calc(var(--handle-height) / 2)) translate(-50%, -100%) rotateX(90deg);
+}
+
+.frontBox .frontFront .sign {
+  position: absolute;
+  padding: 0 0.5em;
+  display: grid;
+  place-items: center;
+  line-height: 1em;
+  text-align: left;
+  background-color: rgb(221, 232, 234);
+  top: calc(var(--front-height) / 3 * 2);
+  left: calc(var(--front-width) / 2);
+  color: rgb(27, 26, 26);
+  transform: translate(-50%, -50%);
+  border: var(--border-size) solid rgb(27, 26, 26);
+  font-family: "SF Mono", "Monaco", "Inconsolata", "Roboto Mono", "Source Code Pro", "Menlo", "Consolas", monospace;
+  font-weight: 600;
+}
+
+.frontBox .frontFront .sign p {
+  margin: 0;
+  font-size: 0.8em;
+  font-weight: 600;
+}
+
+.frontBox .leftFront {
+  position: absolute;
+  width: var(--front-thickness);
+  height: var(--front-height);
+  background-color: var(--side-color);
+  border: var(--border-size) solid var(--border-color);
+  transform: rotateY(-90deg) translateX(calc(var(--front-thickness) / 2));
+  left: calc((var(--front-thickness) / -2) - var(--border-size));
+  top: calc(var(--border-size) * -1);
+}
+
+.frontBox .rightFront {
+  position: absolute;
+  width: var(--front-thickness);
+  height: var(--front-height);
+  background-color: var(--side-color);
+  transform: rotateY(90deg) translateX(calc(var(--front-thickness) / -2));
+  border: var(--border-size) solid var(--border-color);
+  right: calc((var(--front-thickness) / -2) - var(--border-size) / 2);
+  top: calc(var(--border-size) * -1);
+}
+
+.frontBox .topFront {
+  position: absolute;
+  width: var(--front-width);
+  height: var(--front-thickness);
+  background-color: var(--side-color-tint);
+  border: var(--border-size) solid var(--border-color);
+  left: calc(var(--border-size) * -1);
+  transform: rotateX(90deg) translateZ(calc(var(--front-thickness) / 2 + var(--border-size)))
+    translateY(calc(var(--front-thickness) / 2));
+}
+
+.backBox {
+  transform: translateZ(calc(var(--width-box) / -2)) rotateY(180deg);
+}
+
+.bottomBox {
+  width: var(--width-box);
+  height: var(--width-box);
+  background-color: var(--side-color-tint);
+  transform-style: preserve-3d;
+  transform: rotateX(-90deg) rotateZ(90deg);
+  top: -0.5em;
+  border: var(--border-size) solid var(--border-color);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(1em, 1fr));
+  padding: 0.5em;
+}
+
+.bottomBox .folder {
+  transform-style: preserve-3d;
+  position: relative;
+  --_degrees: 85deg;
+  --_folder-height: calc(var(--height-box) + 0.5em);
+  --_formula: calc(cos(85deg) * var(--_folder-height) / 2);
+  --_formula-neg: calc(cos(85deg) * var(--_folder-height) / -2);
+  transition: transform 0.2s ease;
+  cursor: pointer;
+}
+
+.bottomBox .folder:hover {
+  transform: scale(1.05);
+}
+
+.bottomBox .folder:hover .fileWrapper {
+  transform: rotateX(90deg) rotateY(-90deg) translate3d(calc(-50% + 2em + var(--border-size)), -153%, 1.5em);
+  transition: transform 0.3s ease;
+}
+
+.bottomBox .folder .fileWrapper {
+  position: absolute;
+  width: calc(var(--width-box) - 1.5em);
+  height: var(--_folder-height);
+  transform: rotateX(90deg) rotateY(-90deg) translate3d(calc(-50% + 2em + var(--border-size)), -53%, 1.5em);
+  transition: transform 0.3s ease;
+  transform-style: preserve-3d;
+}
+
+.bottomBox .folder .folderBack,
+.bottomBox .folder .folderFront {
+  position: absolute;
+  width: var(--_folder-height);
+  height: 100%;
+  background-color: rgb(216, 250, 66);
+  border: var(--border-size) solid rgb(82, 94, 24);
+}
+
+.bottomBox .folder .folderBack {
+  transform: translateZ(calc(var(--_folder-height) / -2)) translateX(var(--_formula)) rotateY(85deg);
+}
+
+.bottomBox .folder .folderBack::before,
+.bottomBox .folder .folderBack::after {
+  position: absolute;
+  content: "";
+  left: 100%;
+  top: 0.5em;
+  content: "";
+  width: 0.2em;
+  height: 0.7em;
+  background-color: rgb(216, 250, 66);
+  border-right: var(--border-size) solid rgb(82, 94, 24);
+  border-left: var(--border-size) solid rgb(216, 250, 66);
+}
+
+.bottomBox .folder .folderBack::before {
+  transform: skewY(30deg);
+  border-top: var(--border-size) solid rgb(82, 94, 24);
+}
+
+.bottomBox .folder .folderBack::after {
+  transform: skewY(-30deg) translateY(50%);
+  border-bottom: var(--border-size) solid rgb(82, 94, 24);
+}
+
+.bottomBox .folder .folderFront {
+  transform: translateZ(calc(var(--_folder-height) / -2)) translateX(var(--_formula-neg)) rotateY(95deg);
+}
+
+.bottomBox .folder .fileWrapper .file {
+  position: relative;
+  width: 100%;
+  height: var(--_folder-height);
+  color: black;
+  background-color: rgb(232, 251, 248);
+  transform-style: preserve-3d;
+}
+
+.bottomBox .folder .fileWrapper .file::before {
+  content: "";
+  background-color: rgb(184, 198, 196);
+  position: absolute;
+  inset: 0;
+  transform: rotateX(0.5deg) translateZ(calc((var(--_folder-height) * (sin(88) / sin(2))) / -2));
+}
+
+.bottomBox .folder .fileWrapper .file::after {
+  content: "";
+  background-color: rgb(169, 178, 176);
+  position: absolute;
+  inset: 0;
+  transform: rotateX(3deg) translateZ(-0.15em);
+}
+
+.bottomBox .folder .fileWrapper .file.clicked {
+  animation: fly 1s forwards;
+}
+
+.bottomBox .folder .fileWrapper .file.notClicked {
+  animation: land 1s forwards;
+}
+
+.bottomBox .folder .fileWrapper .file img {
+  display: block;
+  width: 60%;
+  object-fit: cover;
+  margin-inline: auto;
+}
+
+.bottomBox .folder .fileWrapper .file p {
+  margin: 0;
+  font-family: "SF Mono", "Monaco", "Inconsolata", "Roboto Mono", "Source Code Pro", "Menlo", "Consolas", monospace;
+  font-weight: 500;
+}
+
+@keyframes fly {
+  0% {
+    transform: translateY(0);
+  }
+  15% {
+    transform: translateY(15%);
+  }
+  25% {
+    transform: translateY(15%);
+  }
+  100% {
+    transform: translateY(-700%);
+  }
+}
+
+@keyframes land {
+  0% {
+    transform: translateY(-700%);
+  }
+  70% {
+    transform: translateY(20%);
+  }
+  85% {
+    transform: translateY(10%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.fileOpen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.fileOpen.closing {
+  animation: fadeOut 0.3s ease-out;
+}
+
+.fileOpen .background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  cursor: pointer;
+}
+
+.fileOpen .fileContents {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border-radius: 12px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  transform: translateY(20px);
+  opacity: 0;
+  animation: slideIn 0.4s ease-out 0.1s forwards;
+  overflow: hidden;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  max-height: calc(100vh - 4rem);
+  display: flex;
+  flex-direction: column;
+}
+
+.fileOpen .fileContents.closing {
+  animation: slideOut 0.3s ease-out forwards;
+}
+
+.fileContentsHeader {
+  position: sticky;
+  top: 0;
+  background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+  border-bottom: 1px solid #e2e8f0;
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+}
+
+.fileContentsBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 2rem;
+  color: #1e293b;
+  line-height: 1.6;
+}
+
+.fileContentsBody::-webkit-scrollbar {
+  width: 8px;
+}
+
+.fileContentsBody::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.fileContentsBody::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.fileContentsBody::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.closeButton {
+  background: #ef4444;
+  border: none;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.closeButton:hover {
+  background: #dc2626;
+  transform: scale(1.05);
+  box-shadow: 0 6px 8px -1px rgba(0, 0, 0, 0.15);
+}
+
+.projectTitle {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.projectMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.techBadge {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.projectLink {
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.projectLink:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+.projectImages {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.projectImages img {
+  width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.projectImages img:hover {
+  transform: scale(1.02);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
