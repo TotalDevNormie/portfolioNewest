@@ -43,7 +43,7 @@ export default function HeroSection() {
             <ArrowDown className="ml-2 h-4 w-4" />
           </Button>
           <a
-            href="https://drive.google.com/file/d/1BJMo4X49wXTyiOaC6ejiWGx4TNqXbwEs/view?usp=sharing"
+            href="https://drive.google.com/file/d/1WlsX52aPxZK8WFIeyrzN9enaXlkOycwr/view?usp=sharing"
             target="_blank"
           >
             <Button
@@ -51,7 +51,7 @@ export default function HeroSection() {
               size="lg"
               className="border-gray-600 text-gray-600 hover:bg-gray-800 hover:text-white"
             >
-              Download CV
+              View Resume
             </Button>
           </a>
         </div>
